@@ -48,7 +48,7 @@ async function refresh(){try{const h=await fetch(API+"/health");if(!h.ok)throw n
   // cannot make the whole application appear offline.
   await Promise.allSettled([loadProducts(),loadInventory(),loadSuppliers(),loadDashboard()]);
 }
-refresh();
+setTimeout(refresh, 500);
 if("serviceWorker"in navigator){
   navigator.serviceWorker.register("./sw.js").catch(()=>{});
 }
