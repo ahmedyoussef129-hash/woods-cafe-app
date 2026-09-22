@@ -4,11 +4,18 @@ from pathlib import Path
 import sqlite3
 from typing import Optional
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 DB = Path(__file__).with_name("woods_cafe.db")
 app = FastAPI(title="WOODS Cafe API", version="1.0.0")
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://ahmedyoussef129-hash.github.io"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 def conn():
     c = sqlite3.connect(DB)
     c.row_factory = sqlite3.Row
