@@ -43,6 +43,23 @@ async function saveWaste(){try{await api("/api/waste",{method:"POST",body:JSON.s
 async function saveExpense(){try{await api("/api/expenses",{method:"POST",body:JSON.stringify({item:val("expItem"),category:val("expCat"),amount:+val("expAmount"),payment_method:val("expPay"),notes:val("expNotes")})});msg("expMsg","تم إضافة المصروف ✅",1);await loadDashboard()}catch(e){msg("expMsg",e.message)}}
 function val(id){return document.getElementById(id).value}function msg(id,t,ok=0){const e=document.getElementById(id);e.className="msg "+(ok?"success":"error");e.textContent=t}
 async function loadDashboard(){try{const d=await api("/api/dashboard");salesK.textContent=money(d.sales);cogsK.textContent=money(d.cogs);invK.textContent=money(d.inventory_value);netK.textContent=money(d.net_profit)}catch(e){}}
-async function refresh(){try{await Promise.all([loadProducts(),loadInventory(),loadSuppliers(),loadDashboard()]);status.textContent="متصل ✓";status.className="status ok"}catch(e){status.textContent="تعذر الاتصال"}}
-refresh();if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js").catch(()=>{});
+async function refresh(){
+  status.textContent="جاري الاتصال...";
+  try{
+    await api("/health");
+    status.textContent="متصل ✓";
+    status.className="status ok";
+  }catch(e){
+    status.textContent="تعذر الاتصال";
+    status.className="status";
+    return;
+  }
+  // Load each section independently so a problem in one old-data table
+  // cannot make the whole application appear offline.
+  await Promise.allSettled([loadProducts(),loadInventory(),loadSuppliers(),loadDashboard()]);
+}
+refresh();
+if("serviceWorker"in navigator){
+  navigator.serviceWorker.register("./sw.js").catch(()=>{});
+}
 </script></body></html>

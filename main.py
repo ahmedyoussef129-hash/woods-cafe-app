@@ -104,14 +104,38 @@ def init_db():
       sale_value REAL NOT NULL DEFAULT 0, employee TEXT DEFAULT '', notes TEXT DEFAULT ''
     );
     """)
-    # Backward-compatible columns for old databases.
-    for col, typ in [
-        ("purchase_unit","TEXT DEFAULT ''"),
-        ("package_qty","REAL NOT NULL DEFAULT 1"),
-        ("package_price","REAL NOT NULL DEFAULT 0"),
-    ]:
-        try: c.execute(f"ALTER TABLE inventory ADD COLUMN {col} {typ}")
-        except sqlite3.OperationalError: pass
+    # Backward-compatible migrations for databases created by older WOODS builds.
+    migrations = {
+        "inventory": [
+            ("purchase_unit","TEXT DEFAULT ''"),
+            ("package_qty","REAL NOT NULL DEFAULT 1"),
+            ("package_price","REAL NOT NULL DEFAULT 0"),
+        ],
+        "purchases": [
+            ("invoice_no","TEXT DEFAULT ''"),
+            ("supplier_id","INTEGER"),
+            ("supplier_name","TEXT DEFAULT ''"),
+            ("unit","TEXT NOT NULL DEFAULT ''"),
+            ("package_price","REAL NOT NULL DEFAULT 0"),
+            ("basic_qty","REAL NOT NULL DEFAULT 0"),
+            ("total","REAL NOT NULL DEFAULT 0"),
+            ("payment_method","TEXT DEFAULT ''"),
+        ],
+        "suppliers": [
+            ("code","TEXT"),
+            ("opening_balance","REAL NOT NULL DEFAULT 0"),
+            ("paid","REAL NOT NULL DEFAULT 0"),
+            ("notes","TEXT DEFAULT ''"),
+        ],
+    }
+    for table, cols in migrations.items():
+        existing = {row["name"] for row in c.execute(f"PRAGMA table_info({table})").fetchall()}
+        for col, typ in cols:
+            if col not in existing:
+                try:
+                    c.execute(f"ALTER TABLE {table} ADD COLUMN {col} {typ}")
+                except sqlite3.OperationalError:
+                    pass
     if c.execute("SELECT COUNT(*) n FROM products").fetchone()["n"] == 0:
         for n,p in [("كورتو",130),("كابتشينو",140),("شاي",50),("قهوة",60)]:
             c.execute("INSERT INTO products(name,base_price) VALUES(?,?)",(n,p))
@@ -263,7 +287,18 @@ def excel_inventory(x: InventoryIn):
     wb.save(XLSX); wb.close()
 
 @app.get("/health")
-def health(): return {"ok":True,"service":"WOODS Cafe API","version":"2.0.0"}
+def health():
+    return {"ok":True,"service":"WOODS Cafe API","version":"2.0.1"}
+
+@app.get("/api/ping")
+def ping():
+    c = conn()
+    try:
+        products_n = c.execute("SELECT COUNT(*) n FROM products").fetchone()["n"]
+        inventory_n = c.execute("SELECT COUNT(*) n FROM inventory").fetchone()["n"]
+        return {"ok": True, "products": products_n, "inventory": inventory_n}
+    finally:
+        c.close()
 
 @app.get("/api/products")
 def products():
