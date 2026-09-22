@@ -5,79 +5,136 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b0b0f">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icons/icon-192.svg">
 <title>WOODS Cafe</title>
 <style>
-:root{--bg:#0b0b0f;--card:#15151c;--gold:#d9a441;--text:#f6f3ea;--muted:#a7a5ad;--accent:#21d4b5;--danger:#e86a6a}
-*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif}
-.app{max-width:520px;margin:auto;min-height:100vh;padding-bottom:86px}
-header{padding:22px 18px 12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:rgba(11,11,15,.95);backdrop-filter:blur(12px);z-index:5}
-.brand{font-size:22px;font-weight:800}.brand span{color:var(--gold);font-style:italic;font-weight:500}
-.time{font-size:12px;color:var(--muted)}
-main{padding:10px 16px}.hero{padding:20px 18px;border:1px solid #282831;border-radius:22px;background:linear-gradient(145deg,#19191f,#101015);margin-bottom:16px}
-.hero h1{margin:0 0 6px;font-size:26px}.hero p{margin:0;color:var(--muted)}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.kpi{background:var(--card);border:1px solid #272731;border-radius:18px;padding:16px}.kpi small{color:var(--muted)}.kpi b{display:block;font-size:21px;margin-top:7px}
-.card{background:var(--card);border:1px solid #272731;border-radius:18px;padding:16px;margin-top:14px}
-button,input,select{font:inherit}button{border:0;border-radius:14px;padding:13px 15px;cursor:pointer}
-.primary{background:var(--gold);color:#17120a;font-weight:800;width:100%}.ghost{background:#24242d;color:var(--text)}
-input,select{width:100%;background:#0f0f14;color:var(--text);border:1px solid #343440;border-radius:12px;padding:12px;margin:7px 0 11px}
-.row{display:flex;gap:10px;align-items:center}.row>*{flex:1}.qty{display:flex;gap:10px;align-items:center}.qty button{background:#25252e;color:#fff;width:52px}.qty b{min-width:35px;text-align:center}
-.bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(15,15,20,.96);border-top:1px solid #292933;display:flex;justify-content:center;gap:8px;padding:9px 10px calc(9px + env(safe-area-inset-bottom));z-index:10}.bottom button{background:transparent;color:var(--muted);padding:9px 10px;font-size:12px}.bottom button.active{color:var(--gold)}
-.search{margin-bottom:12px}.item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #292933}.item:last-child{border-bottom:0}.price{color:var(--gold);font-weight:800}
-.hidden{display:none}.tag{display:inline-block;padding:5px 8px;border-radius:8px;background:#1d302d;color:var(--accent);font-size:11px}
+:root{--bg:#0b0b0f;--card:#15151c;--gold:#d9a441;--text:#f6f3ea;--muted:#a7a5ad;--green:#45c77a;--red:#e56b6f}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+.app{max-width:560px;margin:auto;padding-bottom:90px}.top{padding:22px 18px 12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:rgba(11,11,15,.96);z-index:5}
+.brand{font-size:24px;font-weight:800}.brand span{color:var(--gold);font-style:italic}.status{font-size:12px;color:var(--muted)}.status.ok{color:var(--green)}
+h2{font-size:20px;margin:18px 0 10px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px}.card{background:var(--card);border:1px solid #25252e;border-radius:16px;padding:15px}.k{color:var(--muted);font-size:12px}.v{font-size:22px;font-weight:800;margin-top:6px}
+section{padding:0 14px}.panel{background:var(--card);border:1px solid #25252e;border-radius:18px;padding:16px;margin-top:12px}
+label{display:block;color:var(--muted);font-size:12px;margin:10px 0 6px}select,input,button{width:100%;border:0;border-radius:12px;padding:13px;font-size:16px}select,input{background:#22222b;color:var(--text)}button{background:var(--gold);color:#15120b;font-weight:800;cursor:pointer}.secondary{background:#292932;color:var(--text)}.danger{background:#5a2529;color:#fff}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.qty{display:flex;gap:8px;align-items:center}.qty button{width:48px;padding:10px}.qty input{text-align:center}.product{display:flex;justify-content:space-between;gap:10px;align-items:center;background:#202028;padding:12px;border-radius:12px;margin:7px 0}.product small{color:var(--muted)}.product button{width:auto;padding:9px 13px}
+.nav{position:fixed;bottom:0;left:0;right:0;max-width:560px;margin:auto;background:#111116;border-top:1px solid #292932;display:grid;grid-template-columns:repeat(4,1fr);padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:10}.nav button{background:transparent;color:var(--muted);font-size:12px;padding:9px 4px}.nav button.active{color:var(--gold)}
+.hide{display:none}.msg{padding:10px;border-radius:12px;margin-top:10px;font-size:13px;background:#22222b}.success{border:1px solid #286d45}.error{border:1px solid #81363a}
+table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:right;padding:8px;border-bottom:1px solid #292932}th{color:var(--muted)}
 </style>
 </head>
 <body>
 <div class="app">
-<header><div class="brand">WOODS <span>Cafe</span></div><div class="time" id="clock"></div></header>
-<main>
-<section id="home">
-<div class="hero"><h1>إدارة WOODS Cafe</h1><p>نسخة iOS تجريبية بواجهة عربية RTL</p></div>
+<header class="top"><div class="brand">WOODS <span>Cafe</span></div><div id="status" class="status">جاري الاتصال...</div></header>
+
+<div id="home">
+<h2>لوحة التحكم</h2>
 <div class="grid">
-<div class="kpi"><small>المبيعات</small><b>0.00 ج.م</b></div>
-<div class="kpi"><small>المصروفات</small><b>0.00 ج.م</b></div>
-<div class="kpi"><small>COGS</small><b>0.00 ج.م</b></div>
-<div class="kpi"><small>قيمة المخزون</small><b>0.00 ج.م</b></div>
+<div class="card"><div class="k">المبيعات</div><div class="v" id="kSales">0.00</div></div>
+<div class="card"><div class="k">عدد المبيعات</div><div class="v" id="kCount">0</div></div>
+<div class="card"><div class="k">قيمة المخزن</div><div class="v" id="kInv">0.00</div></div>
+<div class="card"><div class="k">تكلفة المبيعات</div><div class="v" id="kCogs">0.00</div></div>
 </div>
-<div class="card"><button class="primary" onclick="show('sales')">💰 تسجيل بيع</button></div>
-</section>
+<section><div class="panel"><b>آخر المبيعات</b><div id="recent" class="msg">جاري التحميل...</div></div></section>
+</div>
 
-<section id="sales" class="hidden">
-<div class="hero"><h1>تسجيل المبيعات</h1><p>بحث سريع واختيار المنتج</p></div>
-<div class="card">
-<input id="search" class="search" placeholder="🔎 ابحث عن المنتج..." oninput="filterProducts()">
-<div id="products"></div>
+<div id="sales" class="hide">
+<h2>تسجيل بيع 💰</h2>
+<section><div class="panel">
+<label>الصنف</label><select id="product"></select>
+<div class="row">
+<div><label>الكمية</label><div class="qty"><button type="button" onclick="changeQty(-1)">−</button><input id="qty" type="number" min="1" value="1"><button type="button" onclick="changeQty(1)">+</button></div></div>
+<div><label>نوع البيع</label><select id="saleType"><option>Guest عادي</option><option>أصحاب الكافيه</option><option>Manager</option></select></div>
 </div>
-<div class="card">
-<label>المنتج</label><input id="product" value="كورتو" readonly>
-<label>الكمية</label>
-<div class="qty"><button onclick="changeQty(-1)">−</button><b id="qty">1</b><button onclick="changeQty(1)">+</button></div>
-<label>نوع البيع</label><select><option>Guest عادي</option><option>أصحاب الكافيه</option><option>Manager</option></select>
-<br><br><button class="primary" onclick="fakeSale()">تسجيل البيع</button>
+<button style="margin-top:14px" onclick="makeSale()">تسجيل البيع</button>
+<div id="saleMsg"></div>
+</div></section>
+<section><div class="panel"><b>الأصناف</b><div id="products"></div></div></section>
 </div>
-</section>
 
-<section id="inventory" class="hidden"><div class="hero"><h1>المخزن</h1><p>بحث في الأصناف والأرصدة</p></div><div class="card"><input placeholder="🔎 ابحث عن صنف..."><div class="item"><span>إسبريسو</span><span class="tag">متاح</span></div><div class="item"><span>سكر</span><span class="tag">متاح</span></div></div></section>
-<section id="more" class="hidden"><div class="hero"><h1>الأقسام</h1><p>الموردين والريسبي والمشتريات والهالك والتقارير</p></div><div class="card">
-<div class="item"><span>👥 الموردين</span><span>›</span></div><div class="item"><span>🧾 الريسبي</span><span>›</span></div><div class="item"><span>🛒 المشتريات</span><span>›</span></div><div class="item"><span>♻️ الهالك</span><span>›</span></div><div class="item"><span>📊 التقارير</span><span>›</span></div></div></section>
-</main>
-<nav class="bottom">
-<button id="n-home" class="active" onclick="show('home')">⌂<br>الرئيسية</button>
-<button id="n-sales" onclick="show('sales')">💰<br>المبيعات</button>
-<button id="n-inventory" onclick="show('inventory')">📦<br>المخزن</button>
-<button id="n-more" onclick="show('more')">☰<br>المزيد</button>
+<div id="inventory" class="hide">
+<h2>المخزن 📦</h2>
+<section><div class="panel"><div id="inventoryList">جاري التحميل...</div></div></section>
+</div>
+
+<div id="more" class="hide">
+<h2>المزيد</h2>
+<section><div class="panel">
+<p>السيرفر: <span id="serverUrl"></span></p>
+<button class="secondary" onclick="refreshAll()">تحديث البيانات</button>
+</div></section>
+</div>
+
+<nav class="nav">
+<button class="active" onclick="showTab('home',this)">الرئيسية</button>
+<button onclick="showTab('sales',this)">المبيعات</button>
+<button onclick="showTab('inventory',this)">المخزن</button>
+<button onclick="showTab('more',this)">المزيد</button>
 </nav>
 </div>
+
 <script>
-const names=["كورتو","كابتشينو","شاي","قهوة","كورتو موكا","هوت شوكليت"];
-let qty=1;
-function show(id){document.querySelectorAll('main section').forEach(x=>x.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.querySelectorAll('.bottom button').forEach(x=>x.classList.remove('active'));let n=document.getElementById('n-'+id);if(n)n.classList.add('active');if(id==='sales')renderProducts(names)}
-function renderProducts(arr){document.getElementById('products').innerHTML=arr.map(n=>`<div class="item" onclick="pick('${n}')"><span>${n}</span><span class="price">130 ج.م</span></div>`).join('')}
-function filterProducts(){let q=document.getElementById('search').value.trim();renderProducts(names.filter(n=>n.includes(q)))}
-function pick(n){document.getElementById('product').value=n}
-function changeQty(d){qty=Math.max(1,qty+d);document.getElementById('qty').textContent=qty}
-function fakeSale(){alert('نسخة iOS تجريبية: تم تجهيز عملية البيع محليًا. الربط مع Excel سيتم في النسخة المتصلة.')}
-function clock(){document.getElementById('clock').textContent=new Date().toLocaleString('ar-EG',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}clock();setInterval(clock,30000);renderProducts(names)
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+const API="https://Ahmedofsa129.pythonanywhere.com";
+let productsData=[];
+
+function money(n){return Number(n||0).toFixed(2)}
+function showTab(id,btn){
+  ["home","sales","inventory","more"].forEach(x=>document.getElementById(x).classList.toggle("hide",x!==id));
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active")); btn.classList.add("active");
+  if(id==="inventory") loadInventory();
+  if(id==="home") loadDashboard();
+}
+async function api(path,options={}){
+  const r=await fetch(API+path,{...options,headers:{"Content-Type":"application/json",...(options.headers||{})}});
+  const data=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(data.detail||"حدث خطأ في السيرفر");
+  return data;
+}
+async function loadProducts(){
+  productsData=await api("/api/products");
+  const sel=document.getElementById("product");
+  sel.innerHTML=productsData.map(p=>`<option value="${escapeHtml(p.name)}">${escapeHtml(p.name)} — ${money(p.base_price)} جنيه</option>`).join("");
+  document.getElementById("products").innerHTML=productsData.map(p=>`<div class="product"><div><b>${escapeHtml(p.name)}</b><br><small>${money(p.base_price)} جنيه</small></div><button onclick="pickProduct('${jsEscape(p.name)}')">اختيار</button></div>`).join("");
+}
+function pickProduct(name){document.getElementById("product").value=name;showTab("sales",document.querySelectorAll(".nav button")[1])}
+function changeQty(n){let x=Math.max(1,Number(document.getElementById("qty").value||1)+n);document.getElementById("qty").value=x}
+async function makeSale(){
+  const msg=document.getElementById("saleMsg");msg.innerHTML="";
+  try{
+    const data=await api("/api/sales",{method:"POST",body:JSON.stringify({
+      product_name:document.getElementById("product").value,
+      qty:Number(document.getElementById("qty").value),
+      sale_type:document.getElementById("saleType").value
+    })});
+    msg.className="msg success";msg.innerHTML=`تم تسجيل البيع ✅<br>الإجمالي: <b>${money(data.total)} جنيه</b><br>تكلفة المبيعات: ${money(data.cogs)} — الربح الإجمالي: ${money(data.gross_profit)}`;
+    document.getElementById("qty").value=1;
+    await loadDashboard(); await loadInventory();
+  }catch(e){msg.className="msg error";msg.textContent=e.message}
+}
+async function loadDashboard(){
+  try{
+    const sales=await api("/api/sales?limit=100");
+    const inv=await api("/api/inventory");
+    document.getElementById("kSales").textContent=money(sales.reduce((a,x)=>a+Number(x.total),0));
+    document.getElementById("kCount").textContent=sales.length;
+    document.getElementById("kCogs").textContent=money(sales.reduce((a,x)=>a+Number(x.cogs),0));
+    document.getElementById("kInv").textContent=money(inv.reduce((a,x)=>a+Number(x.balance)*Number(x.unit_cost),0));
+    document.getElementById("recent").innerHTML=sales.length?sales.slice(0,8).map(x=>`<div style="padding:7px 0;border-bottom:1px solid #292932"><b>${escapeHtml(x.product_name)}</b> × ${x.qty}<br><small>${escapeHtml(x.sale_type)} — ${money(x.total)} جنيه</small></div>`).join(""):"لا توجد مبيعات بعد";
+  }catch(e){document.getElementById("recent").textContent=e.message}
+}
+async function loadInventory(){
+  const box=document.getElementById("inventoryList");
+  try{
+    const inv=await api("/api/inventory");
+    box.innerHTML=inv.length?`<table><tr><th>الصنف</th><th>الرصيد</th><th>الوحدة</th><th>القيمة</th></tr>${inv.map(x=>`<tr><td>${escapeHtml(x.item_name)}</td><td>${money(x.balance)}</td><td>${escapeHtml(x.unit)}</td><td>${money(Number(x.balance)*Number(x.unit_cost))}</td></tr>`).join("")}</table>`:"المخزن فارغ حاليًا";
+  }catch(e){box.textContent=e.message}
+}
+async function refreshAll(){
+  await loadProducts();await loadDashboard();await loadInventory();
+  const s=document.getElementById("status");s.textContent="متصل ✓";s.className="status ok";
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function jsEscape(s){return String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'")}
+document.getElementById("serverUrl").textContent=API;
+refreshAll().catch(()=>{document.getElementById("status").textContent="تعذر الاتصال";});
+if("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(()=>{});
 </script>
-</body></html>
+</body>
+</html>
