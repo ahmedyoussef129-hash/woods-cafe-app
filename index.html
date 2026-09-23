@@ -1,6 +1,12 @@
 <!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b0b0f"><link rel="manifest" href="manifest.webmanifest"><title>WOODS Cafe</title>
 <style>
 :root{--bg:#0b0b0f;--card:#15151c;--gold:#d9a441;--text:#f6f3ea;--muted:#aaa8b0;--green:#45c77a;--red:#e56b6f}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}.app{max-width:620px;margin:auto;padding-bottom:92px}.top{padding:20px 16px 12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#0b0b0ff2;backdrop-filter:blur(12px);z-index:5}.brand{font-size:25px;font-weight:800}.brand span{color:var(--gold);font-style:italic}.status{font-size:12px;color:var(--muted)}.ok{color:var(--green)}h2{margin:14px 0;font-size:22px}section{padding:0 14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.card,.panel{background:var(--card);border:1px solid #292933;border-radius:17px;padding:15px;margin-bottom:12px}.k{color:var(--muted);font-size:12px}.v{font-size:21px;font-weight:800;margin-top:5px}.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}label{font-size:12px;color:var(--muted);display:block;margin:9px 0 5px}input,select,button{width:100%;padding:12px;border-radius:12px;border:0;font:inherit}input,select{background:#22222b;color:var(--text)}button{background:var(--gold);font-weight:800;cursor:pointer}.secondary{background:#292932;color:var(--text)}.danger{background:#57262a;color:white}.msg{padding:11px;border-radius:12px;margin-top:10px;background:#22222b;font-size:13px}.success{border:1px solid #287b4a}.error{border:1px solid #8b3a3e}.item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 0;border-bottom:1px solid #292933}.item:last-child{border-bottom:0}.item button{width:auto;padding:8px 12px}.hide{display:none}.nav{position:fixed;bottom:0;left:0;right:0;max-width:620px;margin:auto;background:#111116;border-top:1px solid #292933;display:grid;grid-template-columns:repeat(4,1fr);z-index:10;padding:7px 7px calc(7px + env(safe-area-inset-bottom))}.nav button{background:transparent;color:var(--muted);font-size:11px;padding:8px 2px}.nav button.active{color:var(--gold)}.subnav{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:12px}.subnav button{background:#25252e;color:#ddd;font-size:12px}.list{max-height:390px;overflow:auto}.small{font-size:12px;color:var(--muted)}
+
+.recipe-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px;overflow:hidden;border-radius:12px}
+.recipe-table th,.recipe-table td{padding:10px 8px;text-align:right;border-bottom:1px solid #292933}
+.recipe-table th{color:var(--gold);font-weight:800;background:#202029}
+.recipe-table td{color:var(--text)}
+.recipe-head{font-size:15px;font-weight:800;margin-bottom:7px}
 </style></head><body><div class="app">
 <header class="top"><div class="brand">WOODS <span>Cafe</span></div><div id="status" class="status">جاري الاتصال...</div></header>
 <div id="home"><section><h2>لوحة التحكم</h2><div class="grid"><div class="card"><div class="k">المبيعات</div><div class="v" id="salesK">0.00</div></div><div class="card"><div class="k">COGS</div><div class="v" id="cogsK">0.00</div></div><div class="card"><div class="k">المخزون</div><div class="v" id="invK">0.00</div></div><div class="card"><div class="k">صافي الربح</div><div class="v" id="netK">0.00</div></div></div><div class="panel"><b>اختصارات التشغيل</b><div class="subnav" style="margin-top:12px"><button onclick="show('purchases')">🛒 شراء</button><button onclick="show('suppliers')">🏢 مورد</button><button onclick="show('inventory')">📦 مخزن</button></div><div class="subnav"><button onclick="show('recipes')">🍹 ريسبي</button><button onclick="show('sales')">💰 بيع</button><button onclick="show('waste')">🗑️ هالك</button></div></div></section></div>
@@ -13,7 +19,7 @@
 
 <div id="inventory" class="hide"><section><h2>📦 المخزن</h2><div class="panel"><label>اسم الصنف</label><input id="invName" placeholder="مثال: سكر"><div class="row"><div><label>الوحدة الأساسية</label><select id="invUnit"><option>جرام</option><option>مللي</option><option>قطعة</option><option>باكت</option></select></div><div><label>وحدة الشراء</label><input id="invPurUnit" placeholder="كيلو / لتر / علبة"></div></div><div class="row"><div><label>كمية العبوة بالوحدة الأساسية</label><input id="invPackQty" type="number" value="1000"></div><div><label>سعر العبوة</label><input id="invPackPrice" type="number" value="0"></div></div><div class="row"><div><label>رصيد أول المدة</label><input id="invOpen" type="number" value="0"></div><div><label>حد إعادة الطلب</label><input id="invReorder" type="number" value="0"></div></div><button onclick="saveInventory()">إضافة صنف للمخزن</button><div id="invMsg"></div></div><div class="panel"><label>🔎 بحث في المخزن</label><input id="invSearch" oninput="filterInventory()" placeholder="ابحث باسم الصنف أو الوحدة"><b>الأصناف الحالية</b><div id="invList" class="list"></div></div></section></div>
 
-<div id="recipes" class="hide"><section><h2>🍹 الريسبي</h2><div class="panel"><label>المنتج النهائي</label><select id="recProduct"></select><label>المكون من المخزن</label><select id="recComponent"></select><div class="row"><div><label>الكمية المستخدمة</label><input id="recQty" type="number" min=".001" step=".001"></div><div><label>الوحدة</label><select id="recUnit"><option>جرام</option><option>مللي</option><option>قطعة</option><option>باكت</option></select></div></div><button onclick="saveRecipe()">إضافة مكون للريسبي</button><div id="recMsg"></div></div><div class="panel"><label>🔎 بحث في الريسبي</label><input id="recSearch" oninput="filterRecipeProducts()" placeholder="ابحث باسم المنتج أو المكون"><div id="recList" class="list small"></div></div></section></div>
+<div id="recipes" class="hide"><section><h2>🍹 الريسبي</h2><div class="panel"><label>المنتج النهائي</label><select id="recProduct"></select><label>المكون من المخزن</label><select id="recComponent"></select><div class="row"><div><label>الكمية المستخدمة</label><input id="recQty" type="number" min=".001" step=".001"></div><div><label>الوحدة</label><select id="recUnit"><option>جرام</option><option>مللي</option><option>قطعة</option><option>باكت</option></select></div></div><button onclick="saveRecipe()">إضافة مكون للريسبي</button><div id="recMsg"></div></div><div class="panel"><label>🔎 بحث في الريسبي</label><input id="recSearch" oninput="filterRecipeProducts()" placeholder="اكتب اسم المنتج مثل: كورتو"><div id="recList"></div></div></section></div>
 
 <div id="waste" class="hide"><section><h2>🗑️ الهالك</h2><div class="panel"><label>الصنف</label><select id="wasteItem"></select><label>الكمية</label><input id="wasteQty" type="number" min=".001" step=".001"><label>سبب الهالك</label><input id="wasteReason"><button class="danger" onclick="saveWaste()">تسجيل الهالك وخصمه</button><div id="wasteMsg"></div></div></section></div>
 
@@ -45,7 +51,45 @@ async function loadSales(){salesData=await api("/api/sales?limit=200");renderSal
 function renderSales(){const q=(document.getElementById("saleSearch")?.value||"").trim().toLowerCase();const a=salesData.filter(x=>`${x.product_name||""} ${x.sale_type||""} ${x.created_at||""}`.toLowerCase().includes(q));document.getElementById("saleList").innerHTML=a.map(x=>`<div class="item"><span><b>${esc(x.product_name||"")}</b> × ${x.qty}<br><small>${esc(x.sale_type||"")} — ${money(x.total)} جنيه — ${esc(x.created_at||"")}</small></span></div>`).join("")||`<div class="msg">لا توجد نتائج</div>`;}
 function filterSales(){renderSales();}
 async function saveSale(){try{const d=await api("/api/sales",{method:"POST",body:JSON.stringify({product_name:val("saleProduct"),qty:+val("saleQty"),sale_type:val("saleType")})});msg("saleMsg",`تم البيع ✅ — الإجمالي ${money(d.total)} — التكلفة ${money(d.cogs)} — الربح ${money(d.gross_profit)}`,1);await loadDashboard();await loadInventory();await loadSales()}catch(e){msg("saleMsg",e.message)}}
-async function filterRecipeProducts(){const q=(document.getElementById("recSearch")?.value||"").trim().toLowerCase();if(!q){document.getElementById("recList").innerHTML="";return;}const names=products.filter(p=>`${p.name}`.toLowerCase().includes(q)).slice(0,15);const chunks=[];for(const p of names){try{const rows=await api(`/api/recipes/${encodeURIComponent(p.name)}`);chunks.push(...rows.map(r=>({product_name:p.name,component_name:r.component_name||r.item_name||r.name||"",qty:r.qty,unit:r.unit})))}catch(e){}}const comp=inventory.filter(i=>`${i.item_name}`.toLowerCase().includes(q));for(const i of comp){try{const rows=await api(`/api/recipes/${encodeURIComponent(i.item_name)}`);chunks.push(...rows.map(r=>({product_name:r.product_name||i.item_name,component_name:r.component_name||r.item_name||"",qty:r.qty,unit:r.unit})))}catch(e){}}const seen=new Set();const a=chunks.filter(x=>{const k=`${x.product_name}|${x.component_name}|${x.qty}|${x.unit}`;if(seen.has(k))return false;seen.add(k);return true});document.getElementById("recList").innerHTML=a.map(x=>`<div class="item"><span><b>${esc(x.product_name)}</b><br><small>${esc(x.component_name)} — ${x.qty} ${esc(x.unit)}</small></span></div>`).join("")||`<div class="msg">لا توجد نتائج</div>`;}
+async function filterRecipeProducts(){
+  const q=(document.getElementById("recSearch")?.value||"").trim().toLowerCase();
+  const box=document.getElementById("recList");
+  if(!q){box.innerHTML="";return;}
+
+  const matches=products.filter(p=>String(p.name||"").toLowerCase().includes(q)).slice(0,10);
+  if(!matches.length){
+    box.innerHTML='<div class="msg">لا يوجد منتج مطابق</div>';
+    return;
+  }
+
+  let htmlOut="";
+  for(const p of matches){
+    try{
+      const rows=await api(`/api/recipes/${encodeURIComponent(p.name)}`);
+      if(!rows.length){
+        htmlOut+=`<div class="panel"><div class="recipe-head">🍹 ${esc(p.name)}</div><div class="small">لا توجد مكونات مسجلة لهذا المنتج</div></div>`;
+        continue;
+      }
+
+      htmlOut+=`<div class="panel">
+        <div class="recipe-head">🍹 ${esc(p.name)}</div>
+        <table class="recipe-table">
+          <thead><tr><th>المكون</th><th>الكمية</th><th>الوحدة</th></tr></thead>
+          <tbody>
+            ${rows.map(r=>`<tr>
+              <td>${esc(r.component_name||r.item_name||r.name||"")}</td>
+              <td>${esc(r.qty??"")}</td>
+              <td>${esc(r.unit||"")}</td>
+            </tr>`).join("")}
+          </tbody>
+        </table>
+      </div>`;
+    }catch(e){
+      htmlOut+=`<div class="msg error">تعذر تحميل ريسبي ${esc(p.name)}</div>`;
+    }
+  }
+  box.innerHTML=htmlOut;
+}
 async function saveRecipe(){try{await api("/api/recipes",{method:"POST",body:JSON.stringify({product_name:val("recProduct"),component_name:val("recComponent"),qty:+val("recQty"),unit:val("recUnit")})});msg("recMsg","تمت إضافة المكون للريسبي ✅",1)}catch(e){msg("recMsg",e.message)}}
 async function saveWaste(){try{await api("/api/waste",{method:"POST",body:JSON.stringify({item_name:val("wasteItem"),qty:+val("wasteQty"),unit:inventory.find(x=>x.item_name===val("wasteItem"))?.unit||"",reason:val("wasteReason")})});msg("wasteMsg","تم تسجيل الهالك وخصمه من المخزن ✅",1);await loadInventory()}catch(e){msg("wasteMsg",e.message)}}
 async function saveExpense(){try{await api("/api/expenses",{method:"POST",body:JSON.stringify({item:val("expItem"),category:val("expCat"),amount:+val("expAmount"),payment_method:val("expPay"),notes:val("expNotes")})});msg("expMsg","تم إضافة المصروف ✅",1);await loadDashboard()}catch(e){msg("expMsg",e.message)}}
