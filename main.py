@@ -287,19 +287,43 @@ def excel_inventory(x: InventoryIn):
     wb.save(XLSX); wb.close()
 
 def excel_sale(x: SaleIn, base_price: float):
-    if not XLSX.exists(): return
+    if not XLSX.exists():
+        raise FileNotFoundError(f"Excel file not found: {XLSX}")
     excel_backup()
     wb=load_workbook(XLSX)
-    ws=wb["المبيعات"]
-    r=first_blank_row(ws,4,14)
-    sale_type={"أصحاب الكافيه":"Owner","Manager":"Manager","Guest":"Guest","عادي":"Guest"}.get(x.sale_type,x.sale_type)
-    ws.cell(r,1).value=datetime.now()
-    ws.cell(r,2).value=x.product_name
-    ws.cell(r,3).value=x.qty
-    ws.cell(r,12).value=sale_type
-    ws.cell(r,13).value=base_price
-    # D:K are the workbook's existing formulas; keep them intact.
-    wb.save(XLSX); wb.close()
+    try:
+        ws=wb["المبيعات"]
+        # The sheet already contains formulas in D:K and preset values in L:M.
+        # Therefore a normal all-columns blank-row search never finds the next input row.
+        r=None
+        for row in range(4, ws.max_row + 2):
+            if all(ws.cell(row,c).value in (None,"") for c in (1,2,3)):
+                r=row
+                break
+        if r is None:
+            r=ws.max_row+1
+            # Extend the existing D:K formulas into a new row if needed.
+            if r > 4:
+                for c in range(4,12):
+                    src=ws.cell(r-1,c)
+                    ws.cell(r,c).value=src.value.replace(str(r-1),str(r)) if isinstance(src.value,str) and src.value.startswith('=') else src.value
+        sale_type={"أصحاب الكافيه":"Owner","Manager":"Manager","Guest":"Guest","عادي":"Guest"}.get(x.sale_type,x.sale_type)
+        ws.cell(r,1).value=datetime.now()
+        ws.cell(r,2).value=x.product_name
+        ws.cell(r,3).value=x.qty
+        ws.cell(r,12).value=sale_type
+        ws.cell(r,13).value=base_price
+        # Keep D:K formulas supplied by the workbook untouched.
+        try:
+            wb.calculation.fullCalcOnLoad = True
+            wb.calculation.forceFullCalc = True
+            wb.calculation.calcMode = "auto"
+        except Exception:
+            pass
+        wb.save(XLSX)
+        return r
+    finally:
+        wb.close()
 
 @app.get("/health")
 def health():
@@ -410,9 +434,14 @@ def sale(x:SaleIn):
                          VALUES(?,?,?,?,?,?,?,?,?,?)""",(now,p["id"],x.qty,x.sale_type,base,unit,tax,total,cogs,gp))
         for r in rows: c.execute("UPDATE inventory SET balance=balance-? WHERE id=?",(float(r["qty"])*x.qty,r["id"]))
         c.commit()
-        try: excel_sale(x, base)
-        except Exception as e: print("Excel sale warning:",e)
-        return {"id":cur.lastrowid,"product":x.product_name,"qty":x.qty,"unit_price":unit,"tax":tax,"total":total,"cogs":cogs,"gross_profit":gp}
+        excel_row=None
+        excel_error=None
+        try:
+            excel_row=excel_sale(x, base)
+        except Exception as e:
+            excel_error=str(e)
+            print("Excel sale warning:",e)
+        return {"id":cur.lastrowid,"product":x.product_name,"qty":x.qty,"unit_price":unit,"tax":tax,"total":total,"cogs":cogs,"gross_profit":gp,"excel_saved":excel_row is not None,"excel_row":excel_row,"excel_error":excel_error}
     except HTTPException: c.rollback(); raise
     finally: c.close()
 
