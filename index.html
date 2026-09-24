@@ -156,7 +156,10 @@ function playRefreshSound(){
   }catch(e){}
 }
 
+let refreshBusy=false;
 async function refresh(fromPull=false){
+  if(refreshBusy) return;
+  refreshBusy=true;
   const statusEl=document.getElementById("status");
   if(fromPull) playRefreshSound();
   statusEl.textContent="جاري التحديث...";
@@ -164,14 +167,15 @@ async function refresh(fromPull=false){
     await api("/health");
     statusEl.textContent="متصل ✓";
     statusEl.className="status ok";
+    // Fast refresh: only reload the data used immediately on the home screen.
+    // Other sections load their own data when opened via show().
+    await Promise.allSettled([loadProducts(),loadInventory(),loadDashboard()]);
   }catch(e){
     statusEl.textContent="تعذر الاتصال";
     statusEl.className="status";
-    return;
+  }finally{
+    refreshBusy=false;
   }
-  // Load each section independently so a problem in one old-data table
-  // cannot make the whole application appear offline.
-  await Promise.allSettled([loadProducts(),loadInventory(),loadSuppliers(),loadDashboard(),loadPurchases(),loadSales(),loadWaste(),loadExpenses()]);
 }
 
 // iPhone pull-to-refresh: only refresh when the page is pulled down from the top.
